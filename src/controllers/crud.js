@@ -70,25 +70,26 @@ export const createBuyer = catchAsync(async (req, res) => {
   }
 
   if (req.files && req.files.agreement) {
- 
     newObject.agreement = (await cloudinary.uploader.upload(
       req.files.agreement[0].path
     )).secure_url
+    console.log("fg----",newObject.agreement)
   }
-
-  if (req.files && req.files.idOrPassport) {
-
-    newObject.idOrPassport = (await cloudinary.uploader.upload(
-      req.files['idOrPassport'][0].path
-    )).secure_url
-  }
-
   if (req.files &&req.files.landDocument) {
-
+  
     newObject.landDocument = (await cloudinary.uploader.upload(
       req.files.landDocument[0].path
+    )).secure_url 
+  }
+  if (req.files && req.files.idOrPassport) {
+    newObject.idOrPassport = (await cloudinary.uploader.upload(
+      req.file.idOrPassport[0].path
     )).secure_url
   }
+
+  
+
+  console.log("-----------------",req.body)
   const result = await Buyer.create(newObject)
   res.status(201).json({
     status: 'success',
