@@ -30,7 +30,7 @@ const upload = multer({ storage: storage })
 export const uploaded = upload.fields([
   { name: 'receipt', maxCount: 1 },
   { name: 'agreement', maxCount: 1 },
-  { name: ' idOrPassport', maxCount: 1 },
+  { name: 'idOrPassport', maxCount: 1 },
   { name: 'landDocument', maxCount: 1 },
   { name: 'codeFile', maxCount: 1 },
   { name: 'images', maxCount: 20 }
