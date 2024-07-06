@@ -10,29 +10,43 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET
 })
+const handleFileUploads = async (req, newObject) => {
+  const uploadPromises = [];
 
-const createOrUpdateBuyer = async (req, res, isUpdate = false) => {
-  let newObject = {...req.body}
-  if (req.file) {
-    
-  }
-  try {
-    if (isUpdate) {
-      let documentToUpdate = await Buyer.findById(req.params.id)
-      if (!documentToUpdate) {
-        throw new AppError(`Buyer not found with ID: ${req.params.id}`, 404)
-      }
-      documentToUpdate.set(newObject)
-      return await documentToUpdate.save()
-    } else {
-      const newBuyer = await Buyer.create(newObject)
-      console.log(newObject)
-      return newBuyer
+  if (req.files) {
+    if (req.files.receipt) {
+      uploadPromises.push(
+        cloudinary.uploader.upload(req.files.receipt[0].path)
+          .then((result) => (newObject.receipt = result.secure_url))
+      );
     }
-  } catch (error) {
-    throw new AppError(error.message, 400)
+
+    if (req.files.agreement) {
+      uploadPromises.push(
+        cloudinary.uploader.upload(req.files.agreement[0].path)
+          .then((result) => (newObject.agreement = result.secure_url))
+      );
+    }
+
+    if (req.files.landDocument) {
+      uploadPromises.push(
+        cloudinary.uploader.upload(req.files.landDocument[0].path)
+          .then((result) => (newObject.landDocument = result.secure_url))
+      );
+    }
+
+    if (req.files.idOrPassport) {
+      uploadPromises.push(
+        cloudinary.uploader.upload(req.files.idOrPassport[0].path)
+          .then((result) => (newObject.idOrPassport = result.secure_url))
+      );
+    }
   }
-}
+
+  await Promise.all(uploadPromises);
+};
+
+
 
 export const getAllBuyers = catchAsync(async (req, res) => {
   const buyers = await Buyer.find();
@@ -60,59 +74,92 @@ export const getAllContactMessages = catchAsync(async (req, res) => {
 });
 
 // CRUD handlers for Buyer
-export const createBuyer = catchAsync(async (req, res) => {
-  let newObject = {...req.body}
+// export const createBuyer = catchAsync(async (req, res) => {
+//   let newObject = {...req.body}
 
-   // Array to store promises for file uploads
-  const uploadPromises = [];
+//    // Array to store promises for file uploads
+//   const uploadPromises = [];
 
-  // Check if req.files exists and handle each file upload
-  if (req.files) {
-    // Upload receipt file if available
-    if (req.files.receipt) {
-      uploadPromises.push(
-        cloudinary.uploader.upload(req.files.receipt[0].path)
-          .then((result) => newObject.receipt = result.secure_url)
-      );
+//   // Check if req.files exists and handle each file upload
+//   if (req.files) {
+//     // Upload receipt file if available
+//     if (req.files.receipt) {
+//       uploadPromises.push(
+//         cloudinary.uploader.upload(req.files.receipt[0].path)
+//           .then((result) => newObject.receipt = result.secure_url)
+//       );
+//     }
+
+//     // Upload agreement file if available
+//     if (req.files.agreement) {
+//       uploadPromises.push(
+//         cloudinary.uploader.upload(req.files.agreement[0].path)
+//           .then((result) => newObject.agreement = result.secure_url)
+//       );
+//     }
+
+//     // Upload landDocument file if available
+//     if (req.files.landDocument) {
+//       uploadPromises.push(
+//         cloudinary.uploader.upload(req.files.landDocument[0].path)
+//           .then((result) => newObject.landDocument = result.secure_url)
+//       );
+//     }
+
+//     // Upload idOrPassport file if available
+//     if (req.files.idOrPassport) {
+//       uploadPromises.push(
+//         cloudinary.uploader.upload(req.files.idOrPassport[0].path)
+//           .then((result) => newObject.idOrPassport = result.secure_url)
+//       );
+//     }
+//   }
+
+
+//   await Promise.all(uploadPromises);
+
+//   console.log("-----------------",req.body)
+//   const result = await Buyer.create(newObject)
+//   res.status(201).json({
+//     status: 'success',
+//     message: 'Buyer created successfully',
+//     data: result
+//   })
+// })
+// Update status of Seller to 'approved'
+export const approveSeller = catchAsync(async (req, res) => {
+  const result = await Seller.findByIdAndUpdate(
+    req.params.id,
+    { status: "approved" },
+    {
+      new: true,
+      runValidators: true,
     }
+  );
 
-    // Upload agreement file if available
-    if (req.files.agreement) {
-      uploadPromises.push(
-        cloudinary.uploader.upload(req.files.agreement[0].path)
-          .then((result) => newObject.agreement = result.secure_url)
-      );
-    }
-
-    // Upload landDocument file if available
-    if (req.files.landDocument) {
-      uploadPromises.push(
-        cloudinary.uploader.upload(req.files.landDocument[0].path)
-          .then((result) => newObject.landDocument = result.secure_url)
-      );
-    }
-
-    // Upload idOrPassport file if available
-    if (req.files.idOrPassport) {
-      uploadPromises.push(
-        cloudinary.uploader.upload(req.files.idOrPassport[0].path)
-          .then((result) => newObject.idOrPassport = result.secure_url)
-      );
-    }
+  if (!result) {
+    throw new AppError(`Seller not found with ID: ${req.params.id}`, 404);
   }
 
+  res.status(200).json({
+    status: "success",
+    message: "Seller status updated to approved",
+    data: result,
+  });
+});
+// CRUD handlers for Buyer
+export const createBuyer = catchAsync(async (req, res) => {
+  let newObject = { ...req.body };
 
-  await Promise.all(uploadPromises);
+  await handleFileUploads(req, newObject);
 
-  console.log("-----------------",req.body)
-  const result = await Buyer.create(newObject)
+  const result = await Buyer.create(newObject);
   res.status(201).json({
-    status: 'success',
-    message: 'Buyer created successfully',
-    data: result
-  })
-})
-
+    status: "success",
+    message: "Buyer created successfully",
+    data: result,
+  });
+});
 export const getBuyerById = catchAsync(async (req, res) => {
   const buyer = await Buyer.findById(req.params.id)
   if (!buyer) {
@@ -179,7 +226,27 @@ const uploadFiles = async req => {
 
   return newObject
 }
+// Update status of Buyer to 'approved'
+export const approveBuyer = catchAsync(async (req, res) => {
+  const result = await Buyer.findByIdAndUpdate(
+    req.params.id,
+    { status: "approved" },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
 
+  if (!result) {
+    throw new AppError(`Buyer not found with ID: ${req.params.id}`, 404);
+  }
+
+  res.status(200).json({
+    status: "success",
+    message: "Buyer status updated to approved",
+    data: result,
+  });
+});
 // Create or update function for Seller
 // CRUD handlers for Seller
 export const createSeller = catchAsync(async (req, res) => {
