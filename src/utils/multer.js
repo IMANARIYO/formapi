@@ -1,8 +1,8 @@
-import dotenv from 'dotenv'
-import fs from 'fs'
-import multer from 'multer'
-import path from 'path'
-import { v2 as cloudinary } from 'cloudinary'
+import dotenv from "dotenv";
+import fs from "fs";
+import multer from "multer";
+import path from "path";
+import { v2 as cloudinary } from "cloudinary";
 
 dotenv.config()
 
@@ -28,10 +28,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage })
 export const uploaded = upload.fields([
-  { name: 'Receipt', maxCount: 1 },
+  { name: 'receipt', maxCount: 1 },
   { name: 'agreement', maxCount: 1 },
-  { name: 'ID/Passport', maxCount: 1 },
-  { name: 'LandDocument', maxCount: 1 },
+  { name: ' idOrPassport', maxCount: 1 },
+  { name: 'landDocument', maxCount: 1 },
+  { name: 'codeFile', maxCount: 1 },
   { name: 'images', maxCount: 20 }
 ])
 

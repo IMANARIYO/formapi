@@ -62,9 +62,9 @@ export const getAllContactMessages = catchAsync(async (req, res) => {
 // CRUD handlers for Buyer
 export const createBuyer = catchAsync(async (req, res) => {
   let newObject = {...req.body}
-  if (req.files && req.files.Receipt) {
+  if (req.files && req.files.receipt) {
  
-    newObject.Receipt = (await cloudinary.uploader.upload(
+    newObject.receipt = (await cloudinary.uploader.upload(
       req.files.Receipt[0].path
     )).secure_url
   }
@@ -76,10 +76,10 @@ export const createBuyer = catchAsync(async (req, res) => {
     )).secure_url
   }
 
-  if (req.files && req.files['ID/Passport']) {
+  if (req.files && req.files.idOrPassport) {
 
     newObject.idOrPassport = (await cloudinary.uploader.upload(
-      req.files['ID/Passport'][0].path
+      req.files['idOrPassport'][0].path
     )).secure_url
   }
 
