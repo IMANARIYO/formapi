@@ -1,0 +1,280 @@
+openapi: 3.0.0
+info:
+  title: Customer API
+  description: API for managing customers at a border
+  version: 1.0.0
+servers:
+  - url: http://localhost:5555/api/v1
+    description: Local server
+  - url: https://comagency-assesmentyvette-serverside.onrender.com/api/v1
+
+paths:
+  /create-customer:
+    post:
+      summary: Create a new customer
+      requestBody:
+         
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                  example: John Doe
+                age:
+                  type: integer
+                  example: 30
+                gender:
+                  type: string
+                  enum: ["Male", "Female", "Other"]
+                  example: Male
+                nationality:
+                  type: string
+                  enum: ["Local", "Foreign"]
+                  example: Local
+                identification:
+                  type: string
+                  example: ABC12345
+                passport:
+                  type: string
+                  example: 987654321
+                purposeOfVisit:
+                  type: string
+                  enum: ["Tourism", "Business", "Education", "Other"]
+                  example: Tourism
+                durationOfStay:
+                  type: integer
+                  example: 10
+                dateOfEntry:
+                  type: string
+                  format: date
+                  example: 2024-06-01
+                portOfEntry:
+                  type: string
+                  example: Airport
+                emailAddress:
+                  type: string
+                  example: mukeshimanayvette2@gmail.com
+                phoneNumber:
+                  type: string
+                  example: +123456789
+      responses:
+        '201':
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Customer created successfully
+                  customer:
+                    $ref: '#/components/schemas/Customer'
+        '500':
+          description: Failed to create customer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    
+
+  /get-alll-customers:
+    get:
+      summary: Get all customers
+      responses:
+        '200':
+          description: Customers retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Customers retrieved successfully
+                  customers:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Customer'
+        '500':
+          description: Failed to retrieve customers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    
+
+  /get-customer-by-id/{id}:
+    get:
+      summary: Get customer by ID
+      parameters:
+        - name: id
+          in: path
+           
+          schema:
+            type: string
+          description: The customer ID
+      responses:
+        '200':
+          description: Customer retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Customer retrieved successfully
+                  customer:
+                    $ref: '#/components/schemas/Customer'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Customer not found
+        '500':
+          description: Failed to retrieve customer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                   
+
+  /update-customer/{id}:
+    put:
+      summary: Update customer by ID
+      parameters:
+        - name: id
+          in: path
+           
+          schema:
+            type: string
+          description: The customer ID
+      requestBody:
+         
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        '200':
+          description: Customer updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Customer updated successfully
+                  customer:
+                    $ref: '#/components/schemas/Customer'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Customer not found
+        '500':
+          description: Failed to update customer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                   
+
+  /delete-customer/{id}:
+    delete:
+      summary: Delete customer by ID
+      parameters:
+        - name: id
+          in: path
+           
+          schema:
+            type: string
+          description: The customer ID
+      responses:
+        '200':
+          description: Customer deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Customer deleted successfully
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Customer not found
+        '500':
+          description: Failed to delete customer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    
+
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        fullName:
+          type: string
+        age:
+          type: integer
+        gender:
+          type: string
+        nationality:
+          type: string
+        identification:
+          type: string
+        passport:
+          type: string
+        purposeOfVisit:
+          type: string
+        durationOfStay:
+          type: integer
+        dateOfEntry:
+          type: string
+          format: date
+        portOfEntry:
+          type: string
+        emailAddress:
+          type: string
+        phoneNumber:
+          type: string
