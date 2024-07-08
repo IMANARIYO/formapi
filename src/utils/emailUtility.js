@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+
 //import { isAdmin } from "../src/middlewares/index.js";
 export const sendEmail = async (to,subject,textContent, htmlContent,adminEmail) => {
   try {

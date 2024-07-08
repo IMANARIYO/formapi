@@ -107,13 +107,26 @@ const Seller = mongoose.model('Seller', sellerSchema)
 // Contact Us Schema
 const contactUsSchema = new mongoose.Schema({
   name: {
-    type: String
+    type: String,
+    required: true,
   },
   email: {
-    type: String
+    type: String,
+    required: true,
   },
   message: {
-    type: String
+    type: String,
+    required: true,
+  },
+  replied: {
+    type: Boolean,
+    default: false,
+  },
+  replyMessage: {
+    type: String,
+  },
+  replyDate: {
+    type: Date,
   }
 })
 

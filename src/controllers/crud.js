@@ -3,6 +3,7 @@ import path from "path";
 import { v2 as cloudinary } from "cloudinary";
 import { AppError, catchAsync } from "../middlewares/globaleerorshandling.js";
 import { Buyer, ContactUs, Seller } from "../models/customerModel.js";
+import { sendEmail } from "../utils/emailUtility.js";
 
 dotenv.config()
 cloudinary.config({
@@ -73,60 +74,6 @@ export const getAllContactMessages = catchAsync(async (req, res) => {
   });
 });
 
-// CRUD handlers for Buyer
-// export const createBuyer = catchAsync(async (req, res) => {
-//   let newObject = {...req.body}
-
-//    // Array to store promises for file uploads
-//   const uploadPromises = [];
-
-//   // Check if req.files exists and handle each file upload
-//   if (req.files) {
-//     // Upload receipt file if available
-//     if (req.files.receipt) {
-//       uploadPromises.push(
-//         cloudinary.uploader.upload(req.files.receipt[0].path)
-//           .then((result) => newObject.receipt = result.secure_url)
-//       );
-//     }
-
-//     // Upload agreement file if available
-//     if (req.files.agreement) {
-//       uploadPromises.push(
-//         cloudinary.uploader.upload(req.files.agreement[0].path)
-//           .then((result) => newObject.agreement = result.secure_url)
-//       );
-//     }
-
-//     // Upload landDocument file if available
-//     if (req.files.landDocument) {
-//       uploadPromises.push(
-//         cloudinary.uploader.upload(req.files.landDocument[0].path)
-//           .then((result) => newObject.landDocument = result.secure_url)
-//       );
-//     }
-
-//     // Upload idOrPassport file if available
-//     if (req.files.idOrPassport) {
-//       uploadPromises.push(
-//         cloudinary.uploader.upload(req.files.idOrPassport[0].path)
-//           .then((result) => newObject.idOrPassport = result.secure_url)
-//       );
-//     }
-//   }
-
-
-//   await Promise.all(uploadPromises);
-
-//   console.log("-----------------",req.body)
-//   const result = await Buyer.create(newObject)
-//   res.status(201).json({
-//     status: 'success',
-//     message: 'Buyer created successfully',
-//     data: result
-//   })
-// })
-// Update status of Seller to 'approved'
 export const approveSeller = catchAsync(async (req, res) => {
   const result = await Seller.findByIdAndUpdate(
     req.params.id,
@@ -434,3 +381,34 @@ export const deleteContactUs = catchAsync(async (req, res) => {
     message: 'Contact message deleted successfully'
   })
 })
+export const replyToContactUs = catchAsync(async (req, res) => {
+  try {
+    const { replyMessage } = req.body;
+    const contactMessage = await ContactUs.findById(req.params.id);
+    
+    if (!contactMessage) {
+      throw new AppError(`Contact message not found with ID: ${req.params.id}`, 404);
+    }
+    
+    contactMessage.replied = true;
+    contactMessage.replyMessage = replyMessage;
+    contactMessage.replyDate = new Date();
+    await contactMessage.save();
+    
+    await sendEmail(
+      contactMessage.email,
+      'Reply to your message',
+      replyMessage,
+      `<p>${replyMessage}</p>`,
+      process.env.ADMIN_EMAIL
+    );
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Replied to contact message successfully',
+      data: contactMessage
+    });
+  } catch (error) {
+    throw new AppError(error.message, 400);
+  }
+});

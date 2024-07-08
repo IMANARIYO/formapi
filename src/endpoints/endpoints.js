@@ -1,5 +1,5 @@
 import express from "express";
-import { approveBuyer, approveSeller, createBuyer, createContactUs, deleteBuyer, deleteContactUs, getAllBuyers, getAllContactMessages, getAllSellers, getBuyerById, getContactUsById, updateBuyer, updateContactUs } from "../controllers/crud.js";
+import { approveBuyer, approveSeller, createBuyer, createContactUs, deleteBuyer, deleteContactUs, getAllBuyers, getAllContactMessages, getAllSellers, getBuyerById, getContactUsById, replyToContactUs, updateBuyer, updateContactUs } from "../controllers/crud.js";
 import { createSeller, deleteSeller, getSellerById, updateSeller } from "../controllers/crud.js";
 import { catchAsync } from "../middlewares/globaleerorshandling.js";
 import { uploaded } from "../utils/multer.js";
@@ -29,3 +29,4 @@ contactUsRouter.get('/contact-us/:id', getContactUsById);
 contactUsRouter.put('/contact-us/:id', updateContactUs);
 contactUsRouter.delete('/contact-us/:id', deleteContactUs);
 contactUsRouter.get('/contact-us', getAllContactMessages);
+contactUsRouter.post('/contact-us/:id/reply', replyToContactUs);
